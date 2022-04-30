@@ -42,14 +42,27 @@ export function RegisterLoginData() {
   });
 
   async function handleRegister(formData: FormData) {
-    const newLoginData = {
-      id: String(uuid.v4()),
-      ...formData
+    try {
+      const newLoginData = {
+        id: String(uuid.v4()),
+        ...formData
+      }
+
+      const dataKey = '@savepass:logins';
+
+      const data = await AsyncStorage.getItem(dataKey)
+
+      const prevData = JSON.parse(data) || []
+
+      const listPasswords = [...prevData, newLoginData]
+
+      await AsyncStorage.setItem(dataKey, JSON.stringify(listPasswords))
+
+      navigate('Home')
+    } catch (error) {
+      Alert.alert('Houve um erro ao salvar')
+      throw new Error(JSON.stringify(error));
     }
-
-    const dataKey = '@savepass:logins';
-
-    // Save data on AsyncStorage and navigate to 'Home' screen
   }
 
   return (
@@ -67,7 +80,7 @@ export function RegisterLoginData() {
             name="service_name"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              'Nome do serviço é obrigatório!'
             }
             control={control}
             autoCapitalize="sentences"
@@ -79,7 +92,7 @@ export function RegisterLoginData() {
             name="email"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              'Email é obrigatório!'
             }
             control={control}
             autoCorrect={false}
@@ -92,7 +105,7 @@ export function RegisterLoginData() {
             name="password"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              'Senha é obrigatória!'
             }
             control={control}
             secureTextEntry
